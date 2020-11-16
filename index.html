@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<script src="libraries/p5.js"></script>
+		<script src="libraries/p5.sound.js"></script>
+		<meta charset="utf-8">
+		<style>
+			* {
+				margin: 0px;
+				padding: 0px;
+			}
+
+			.settings {
+				margin-top: 50px;
+				display: flex;
+				justify-content: center;
+			}
+
+			/* .inputbox {
+				margin-top: 50px;
+				display: flex;
+				justify-content: center;
+			} */
+
+			.userInput {
+				width: 50px;
+				margin-right: 10px;
+			}
+
+			#row {
+				display: inline-block;
+			}
+
+			#gmap {
+				margin-left: 50px;
+			}
+
+			.btnBox {
+				margin-right: 30px;
+			}
+
+			.btnBox >input {
+				margin-left: 10px;
+			}
+
+		</style>
+
+	</head>
+	<body>
+		<div class="settings">
+			<div class="btnBox">
+				<input type="radio" name="group1" value="1" id="start"><label for="start">起点</label>
+				<input type="radio" name="group1" value="2" id="end"><label for="end">终点</label>
+				<input type="radio" name="group1" value="3" id="block" checked="checked"><label for="block">障碍物</label>
+			</div>
+			<div class="inputbox">
+				<label>行数: </label><input type="text" id="row" class="userInput" value="20">
+				<label>列数: </label><input type="text" id="col" class="userInput" value="20">
+				<label>障碍物比例: </label><input type="text" id="blockPercent" class="userInput" value="0.1">
+				<button type="button" id="gmap">生成地图</button>
+			</div>
+		</div>
+
+
+		<script src="sketch.js"></script>
+		<script src="Cell.js"></script>
+		<script src="AStarAgent.js"></script>
+		<script src="Map.js"></script>
+		<script src="Components.js"></script>
+	</body>
+</html>
