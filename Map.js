@@ -18,7 +18,7 @@ class Map {
 
     init() {
         for (var i = 0; i < cols; i++) {
-            this.grid[i] = []
+            this.grid[i] = [];
             for (var j = 0; j < rows; j++) {
                 var isWall = random(1.0) < this.wallRatio;
                 this.grid[i][j] = new Cell(i, j, isWall);

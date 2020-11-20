@@ -38,8 +38,39 @@ var radioStart;
 var radioEnd;
 var radioBlock;
 
-
 var isReady = false;
+
+// Timer计时器
+var t;
+var timings = {};
+
+function clearTimings() {
+    timings = {};
+}
+
+function startTime() {
+    t = millis(); //记录从setup被调用开始后的经过的时间
+}
+
+function recordTime(n) { //n是时间节点的名称
+    if (!timings[n]) {
+        timings[n] = {
+            sum: millis() - t,
+            count: 1,
+        }
+    } else {
+        timings[n].sum = timings[n].sum + millis() - t;
+        timings[n].count = timings[n].count + 1;
+    }
+}
+
+function logTimings() {
+    for (var prop in timings) {
+        if (timings.hasOwnProperty(prop)) {
+            console.log(prop + " = " + (timings[prop].sum / timings[prop].count).toString() + " ms");
+        }
+    }
+}
 
 function initSearch() {
     mapGraph = null;
@@ -79,12 +110,12 @@ function initCanvas() {
     cols = inputCol.value();
     wallRatio = wallPercent.value();
 
-    mapw = cols*cellw;
-    maph = rows*cellh;
+    mapw = cols * cellw;
+    maph = rows * cellh;
 
-    var canvasWidth = mapw+100;
+    var canvasWidth = mapw + 100;
     canvas = createCanvas(canvasWidth, canvasWidth);
-    canvas.position(screen.availWidth / 2 - canvasWidth/2, 100);
+    canvas.position(screen.availWidth / 2 - canvasWidth / 2, 100);
 
     gameMap = new Map(cols, rows, mapw, maph, wallRatio);
     agent1 = new AStarAgent(gameMap.grid, pickNode(0, 0), pickNode());
@@ -93,15 +124,15 @@ function initCanvas() {
     initSearch();
 
     removeOrgButton(runPauseButton);
-    runPauseButton = new Button("运行", mapw+30, 20, 50, 30, runpause);
+    runPauseButton = new Button("运行", mapw + 30, 20, 50, 30, runpause);
     components.push(runPauseButton);
 
     removeOrgButton(stepButton);
-    stepButton = new Button("单步", mapw+30, 70, 50, 30, step)
+    stepButton = new Button("单步", mapw + 30, 70, 50, 30, step)
     components.push(stepButton);
 
     removeOrgButton(resetButton);
-    resetButton = new Button("重置", mapw+30, 120, 50, 30, restart)
+    resetButton = new Button("重置", mapw + 30, 120, 50, 30, restart)
     components.push(resetButton);
 
     isReady = true;
@@ -115,9 +146,8 @@ function removeOrgButton(btn) {
 }
 
 function setup() {
-    // translate(left_pos,top_pos);
-    // createCanvas(mapw + left_pos * 2, maph + top_pos * 2);
-    // canvas.class('myCav');
+
+    startTime(); //开始计时
 
     radioStart = select('#start');
     radioEnd = select('#end');
@@ -131,6 +161,7 @@ function setup() {
     btn.mousePressed(initCanvas);
 
     // components.push(new SettingBox(""))
+    recordTime("Setup");
 
 }
 
@@ -148,6 +179,8 @@ function runpause(button) {
 
 function restart(button) {
     //重置状态
+    logTimings();
+    clearTimings();
     initSearch();
     pauseCheck(true);
 }
@@ -227,18 +260,24 @@ function drawButtons() {
 
 function searchStep() {
     if (!paused || stepsAllowed > 0) {
+        startTime();
         var result = agent1.step();
+        recordTime("AStar Iteration");
         stepsAllowed--;
 
         switch (result) {
             case -1:
                 status = "No Solution";
+                logTimings();
+                pauseCheck(true);
                 break;
             case 0:
                 status = "Still Searching";
                 break;
             case 1:
                 status = "Goal Reached";
+                logTimings();
+                pauseCheck(true);   //暂停
                 break;
         }
     }
@@ -258,12 +297,14 @@ function drawMap() {
 }
 
 function calcPath(end) {
+    // startTime();
     path = []
     var tmp = end;
     while (tmp) {
         path.push(tmp);
         tmp = tmp.parent;
     }
+    // recordTime("Generate Path");
     return path;
 }
 
@@ -307,7 +348,11 @@ function draw() {
 
         text("当前状态:" + status, 10, 450);
 
+        // startTime();
+
         drawMap();
+
+        // recordTime("Draw Map");
 
         drawAgentTrace(agent1);
     }
